@@ -1,0 +1,22 @@
+type Food{
+  id: ID!
+  name: String!
+  description: String!
+  price: Int!
+}
+
+type Query{
+  foods: [Food!]!
+}
+
+input NewFood{
+  name: String!
+  description: String!
+  price: Int!
+}
+
+type Mutation{
+  createFood(input: NewFood!): Food!
+  updateFood(id: ID!,input: NewFood!): Food!
+  deleteFood(id:ID!): Boolean!
+}
