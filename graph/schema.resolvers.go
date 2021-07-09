@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/andrewtanjaya21/test_go/graph/generated"
@@ -24,7 +25,13 @@ func (r *mutationResolver) DeleteFood(ctx context.Context, id string) (bool, err
 }
 
 func (r *queryResolver) Foods(ctx context.Context) ([]*model.Food, error) {
-	panic(fmt.Errorf("not implemented"))
+	var foods []*model.Food
+	err := r.DB.Model(&foods).Select()
+	if err != nil{
+		return nil, errors.New("Failed query foods")
+	}
+	return foods, nil
+
 }
 
 // Mutation returns generated.MutationResolver implementation.

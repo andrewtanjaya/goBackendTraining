@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-pg/pg/v10"
 	"log"
 	"net/http"
 	"os"
@@ -14,12 +15,18 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	pgDB := pg.Connect(&pg.Options{
+		Addr:     ":5432",
+		User:     "postgres",
+		Password: "root",
+		Database: "resto",
+	})
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{DB: pgDB}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
