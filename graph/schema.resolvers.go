@@ -6,22 +6,56 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
-
 	"github.com/andrewtanjaya21/test_go/graph/generated"
 	"github.com/andrewtanjaya21/test_go/graph/model"
 )
 
 func (r *mutationResolver) CreateFood(ctx context.Context, input model.NewFood) (*model.Food, error) {
-	panic(fmt.Errorf("not implemented"))
+	food := model.Food{
+		Name:        input.Name,
+		Description: input.Description,
+		Price:       input.Price,
+	}
+	_,err := r.DB.Model(&food).Insert()
+
+	if(err != nil){
+		return nil, errors.New("Insert Food Failed")
+	}
+
+	return &food, nil
 }
 
 func (r *mutationResolver) UpdateFood(ctx context.Context, id string, input model.NewFood) (*model.Food, error) {
-	panic(fmt.Errorf("not implemented"))
+	var food model.Food
+	err := r.DB.Model(&food).Where("id = ?", id).First()
+	if err!= nil{
+		return nil, errors.New("Update Food Failed")
+	}
+
+	food.Price = input.Price
+	food.Description = input.Description
+	food.Name = input.Name
+
+	_,error := r.DB.Model(&food).Where("id = ?", id).Update()
+
+	if error != nil{
+		return nil, errors.New("Update Food Failed")
+	}
+	return &food, nil
 }
 
 func (r *mutationResolver) DeleteFood(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
+	var food model.Food
+	err := r.DB.Model(&food).Where("id = ?", id).First()
+	if err!= nil{
+		return false, errors.New("Delete Food Failed")
+	}
+	_,error := r.DB.Model(&food).Where("id = ?", id).Delete()
+
+	if error != nil{
+		return false, errors.New("Delete Food Failed")
+	}
+	return true, nil
 }
 
 func (r *queryResolver) Foods(ctx context.Context) ([]*model.Food, error) {
